@@ -3,7 +3,7 @@
 
 # 2021.07.08,   yo.
 # 2022.10.25 reviced,   yo.
-# 2025.07.25 reviced,   yo.
+# 2025.07.27 reviced,   yo.
 #
 # 立花証券ｅ支店ＡＰＩ利用のサンプルコード
 #
@@ -21,8 +21,10 @@
 # 注文値段: my_kakaku  （*:指定なし、0:成行、上記以外は、注文値段。小数点については、関連資料:「立花証券・e支店・API、REQUEST I/F、マスタデータ利用方法」の「2-12. 呼値」参照。）
 # 注文数量: my_kabusuu
 #
+#
 # 利用方法: 
-# 事前に「e_api_login_tel.py」を実行して、仮想URL（1日券）等を取得しておいてください。
+# 事前に「e_api_login_tel.py」を実行して、
+# 仮想URL（1日券）等を取得しておいてください。
 #
 #
 # == ご注意: ========================================
@@ -247,6 +249,29 @@ def func_read_from_file(str_fname):
         print(type(e))
 
 
+# 機能: class_req型データをjson形式の文字列に変換する。
+# 返値: json形式の文字
+# 第１引数： class_req型データ
+def func_make_json_format(work_class_req):
+    work_key = ''
+    work_value = ''
+    str_json_data =  '{\n\t'
+    for i in range(len(work_class_req)) :
+        work_key = func_strip_dquot(work_class_req[i].str_key)
+        if len(work_key) > 0:
+            if work_key[:1] == 'a' :
+                work_value = work_class_req[i].str_value
+                str_json_data = str_json_data + work_class_req[i].str_key \
+                                    + ':' + func_strip_dquot(work_value) \
+                                    + ',\n\t'
+            else :
+                work_value = func_check_json_dquat(work_class_req[i].str_value)
+                str_json_data = str_json_data + func_check_json_dquat(work_class_req[i].str_key) \
+                                    + ':' + work_value \
+                                    + ',\n\t'
+    str_json_data = str_json_data[:-3] + '\n}'
+    return str_json_data
+
 
 # 機能： API問合せ文字列を作成し返す。
 # 戻り値： api問合せのurl文字列
@@ -289,18 +314,6 @@ def func_api_req(str_url):
     json_req = json.loads(str_shiftjis)
 
     return json_req
-
-
-# 機能: class_req型データをjson形式の文字列に変換する。
-# 返値: json形式の文字
-# 第１引数： class_req型データ
-def func_make_json_format(work_class_req):
-    str_json_data =  '{\n\t'
-    for i in range(len(work_class_req)) :
-        if len(work_class_req[i].str_key) > 0:
-            str_json_data = str_json_data + work_class_req[i].str_key + ':' + work_class_req[i].str_value + ',\n\t'
-    str_json_data = str_json_data[:-3] + '\n}'
-    return str_json_data
 
 
 # 機能： アカウント情報をファイルから取得する
@@ -389,11 +402,14 @@ def func_write_to_file(str_fname_output, str_data):
 # 引数2: 保存するp_no
 # 備考:
 def func_save_p_no(str_fname_output, int_p_no):
-    # "p_no"を保存する。
-    str_info_p_no = '{\n'
-    str_info_p_no = str_info_p_no + '\t' + '"p_no":"' + str(int_p_no) + '"\n'
-    str_info_p_no = str_info_p_no + '}\n'
-    func_write_to_file(str_fname_output, str_info_p_no)
+    req_item = [class_req()]
+    str_key = '"p_no"'
+    str_value = func_check_json_dquat(str(int_p_no))
+    #req_item.append(class_req())
+    req_item[-1].add_data(str_key, str_value)
+
+    str_json_p_no = func_make_json_format(req_item)
+    func_write_to_file(str_fname_output, str_json_p_no)
     print('現在の"p_no"を保存しました。 p_no =', int_p_no)            
     print('ファイル名:', str_fname_output)
 
@@ -504,7 +520,35 @@ def func_save_p_no(str_fname_output, int_p_no):
 # "sCLMID":"CLMKabuNewOrder",
 # "sResultCode":"0",
 # "sResultText":"",
-# "sWarningCode":"0",
+# "sWarningCode":"0",req_item = [class_req()]
+    str_p_sd_date = func_p_sd_date(datetime.datetime.now())     # システム時刻を所定の書式で取得
+
+    # 1:売 を指定
+    str_sBaibaiKubun = '1'          # 12.売買区分  1:売、3:買、5:現渡、7:現引。
+    # 2:新規(制度信用6ヶ月) を指定
+    str_sGenkinShinyouKubun = '2'   # 16.現金信用区分     0:現物、
+                                    #                   2:新規(制度信用6ヶ月)、
+                                    #                   4:返済(制度信用6ヶ月)、
+                                    #                   6:新規(一般信用6ヶ月)、
+                                    #                   8:返済(一般信用6ヶ月)。
+
+
+    # 他のパラメーターをセット
+    #str_sZyoutoekiKazeiC            # 8.譲渡益課税区分    1：特定  3：一般  5：NISA     ログインの返信データで設定済み。 
+    str_sOrderExpireDay = '0'        # 17.注文期日  0:当日、上記以外は、注文期日日(YYYYMMDD)[10営業日迄]。
+    str_sGyakusasiOrderType = '0'    # 18.逆指値注文種別  0:通常、1:逆指値、2:通常+逆指値
+    str_sGyakusasiZyouken = '0'      # 19.逆指値条件  0:指定なし、条件値段(トリガー価格)
+    str_sGyakusasiPrice = '*'        # 20.逆指値値段  *:指定なし、0:成行、*,0以外は逆指値値段。
+    str_sTatebiType = '*'            # 21.建日種類  *:指定なし(現物または新規) 、1:個別指定、2:建日順、3:単価益順、4:単価損順。
+    str_sTategyokuZyoutoekiKazeiC =  '*'    # 9.建玉譲渡益課税区分  信用建玉における譲渡益課税区分(現引、現渡で使用)。  *:現引、現渡以外の取引、1:特定、3:一般、5:NISA
+    #str_sSecondPassword             # 22.第二パスワード    APIでは第２暗証番号を省略できない。 関連資料:「立花証券・e支店・API、インターフェース概要」の「3-2.ログイン、ログアウト」参照     ログインの返信データで設定済み。
+    
+
+    str_key = '"p_no"'
+    str_value = func_check_json_dquat(str(int_p_no))
+    #req_item.append(class_req())
+    req_item[-1].add_data(str_key, str_value)
+
 # "sWarningText":"",
 # "sOrderNumber":"0",
 # "sEigyouDay":"20200728",
@@ -538,7 +582,7 @@ def func_neworder_sell_sinyou_open(int_p_no,
                                   str_sCondition,
                                   str_sOrderPrice,
                                   str_sOrderSuryou,
-                                  class_cust_property):
+                                  class_login_property):
     # 送信項目の解説は、マニュアル「立花証券・ｅ支店・ＡＰＩ（ｖ〇）、REQUEST I/F、機能毎引数項目仕様」
     # p4/46 No.5 引数名:CLMKabuNewOrder を参照してください。
 
@@ -623,7 +667,7 @@ def func_neworder_sell_sinyou_open(int_p_no,
 
     # 税区分
     str_key = '"sZyoutoekiKazeiC"'  # 税口座区分
-    if class_cust_property.sTokuteiKouzaKubunSinyou == '0':     # 一般口座の場合
+    if class_login_property.sTokuteiKouzaKubunSinyou == '0':     # 一般口座の場合
         str_value = '3'
     else:   # 特定口座、源泉徴収あり:1、無し:2
         str_value = '1'
@@ -662,19 +706,19 @@ def func_neworder_sell_sinyou_open(int_p_no,
     req_item[-1].add_data(str_key, str_value)
 
     str_key = '"sSecondPassword"'    # 第二パスワード   APIでは第２暗証番号を省略できない。
-    str_value = class_cust_property.sSecondPassword     # 引数の口座属性クラスより取得
+    str_value = class_login_property.sSecondPassword     # 引数の口座属性クラスより取得
     req_item.append(class_req())
     req_item[-1].add_data(str_key, str_value)
 
     # 返り値の表示形式指定
     str_key = '"sJsonOfmt"'
-    str_value = class_cust_property.sJsonOfmt    # "5"は "1"（ビット目ＯＮ）と”4”（ビット目ＯＮ）の指定となり「ブラウザで見や易い形式」且つ「引数項目名称」で応答を返す値指定
+    str_value = class_login_property.sJsonOfmt    # "5"は "1"（ビット目ＯＮ）と”4”（ビット目ＯＮ）の指定となり「ブラウザで見や易い形式」且つ「引数項目名称」で応答を返す値指定
     req_item.append(class_req())
     req_item[-1].add_data(str_key, str_value)
 
     # URL文字列の作成
     str_url = func_make_url_request(False, \
-                                     class_cust_property.sUrlRequest, \
+                                     class_login_property.sUrlRequest, \
                                      req_item)
 
     json_return = func_api_req(str_url)
@@ -710,7 +754,6 @@ if __name__ == "__main__":
     my_sCondition = '0'    # 13.執行条件。  0:指定なし、2:寄付、4:引け、6:不成。指し値は、0:指定なし。
     my_sOrderPrice = '000'   # 14.注文値段。  *:指定なし、0:成行、上記以外は、注文値段。小数点については、関連資料:「立花証券・e支店・API、REQUEST I/F、マスタデータ利用方法」の「2-12. 呼値」参照。
     my_sOrderSuryou = '100'  # 15.注文数量。
-    
     # --- 以上設定項目 -------------------------------------------------------------------------
 
     # --- ファイル名等を設定 ------------------------------------------------------------------
