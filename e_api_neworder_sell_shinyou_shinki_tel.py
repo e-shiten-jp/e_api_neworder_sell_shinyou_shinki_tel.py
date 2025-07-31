@@ -25,6 +25,7 @@
 # 利用方法: 
 # 事前に「e_api_login_tel.py」を実行して、
 # 仮想URL（1日券）等を取得しておいてください。
+# 「e_api_login_tel.py」と同じディレクトリで実行してください。
 #
 #
 # == ご注意: ========================================
@@ -245,7 +246,20 @@ def func_read_from_file(str_fname):
                 str_read = str_read + line
         return str_read
     except IOError as e:
-        print('Can not Write!!!')
+        print('ファイルを読み込めません!!! ファイル名：',str_fname)
+        print(type(e))
+
+
+# 機能: ファイルに書き込む
+# 引数1: 出力ファイル名
+# 引数2: 出力するデータ
+# 備考:
+def func_write_to_file(str_fname_output, str_data):
+    try:
+        with open(str_fname_output, 'w', encoding = 'utf-8') as fout:
+            fout.write(str_data)
+    except IOError as e:
+        print('ファイルに書き込めません!!!  ファイル名：',str_fname_output)
         print(type(e))
 
 
@@ -384,32 +398,16 @@ def func_get_p_no(fname, class_login_property):
     class_login_property.p_no = int(json_p_no_info.get('p_no'))
         
     
-# 機能: ファイルに書き込む
-# 引数1: 出力ファイル名
-# 引数2: 出力するデータ
-# 備考:
-def func_write_to_file(str_fname_output, str_data):
-    try:
-        with open(str_fname_output, 'w', encoding = 'utf-8') as fout:
-            fout.write(str_data)
-    except IOError as e:
-        print('Can not Write!!!')
-        print(type(e))
-
-
 # 機能: p_noを保存するためのjson形式のテキストデータを作成します。
 # 引数1: p_noを保存するファイル名（fname_info_p_no = "e_api_info_p_no.txt"）
 # 引数2: 保存するp_no
 # 備考:
 def func_save_p_no(str_fname_output, int_p_no):
-    req_item = [class_req()]
-    str_key = '"p_no"'
-    str_value = func_check_json_dquat(str(int_p_no))
-    #req_item.append(class_req())
-    req_item[-1].add_data(str_key, str_value)
-
-    str_json_p_no = func_make_json_format(req_item)
-    func_write_to_file(str_fname_output, str_json_p_no)
+    # "p_no"を保存する。
+    str_info_p_no = '{\n'
+    str_info_p_no = str_info_p_no + '\t' + '"p_no":"' + str(int_p_no) + '"\n'
+    str_info_p_no = str_info_p_no + '}\n'
+    func_write_to_file(str_fname_output, str_info_p_no)
     print('現在の"p_no"を保存しました。 p_no =', int_p_no)            
     print('ファイル名:', str_fname_output)
 
@@ -756,7 +754,7 @@ if __name__ == "__main__":
     my_sOrderSuryou = '100'  # 15.注文数量。
     # --- 以上設定項目 -------------------------------------------------------------------------
 
-    # --- ファイル名等を設定 ------------------------------------------------------------------
+    # --- ファイル名等を設定（実行ファイルと同じディレクトリ） ---------------------------------------
     fname_account_info = "e_api_account_info.txt"
     fname_login_response = "e_api_login_response.txt"
     fname_info_p_no = "e_api_info_p_no.txt"
