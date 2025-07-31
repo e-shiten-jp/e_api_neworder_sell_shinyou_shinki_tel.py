@@ -511,50 +511,50 @@ def func_save_p_no(str_fname_output, int_p_no):
 
 # 応答電文
 # {
-# "p_sd_date":"2020.07.28-14:47:32.055",
-# "p_rv_date":"2020.07.28-14:47:31.696",
-# "p_errno":"0",
-# "p_err":"",
-# "sCLMID":"CLMKabuNewOrder",
-# "sResultCode":"0",
-# "sResultText":"",
-# "sWarningCode":"0",req_item = [class_req()]
-    str_p_sd_date = func_p_sd_date(datetime.datetime.now())     # システム時刻を所定の書式で取得
+    # "p_sd_date":"2020.07.28-14:47:32.055",
+    # "p_rv_date":"2020.07.28-14:47:31.696",
+    # "p_errno":"0",
+    # "p_err":"",
+    # "sCLMID":"CLMKabuNewOrder",
+    # "sResultCode":"0",
+    # "sResultText":"",
+    # "sWarningCode":"0",req_item = [class_req()]
+    # str_p_sd_date = func_p_sd_date(datetime.datetime.now())     # システム時刻を所定の書式で取得
 
-    # 1:売 を指定
-    str_sBaibaiKubun = '1'          # 12.売買区分  1:売、3:買、5:現渡、7:現引。
-    # 2:新規(制度信用6ヶ月) を指定
-    str_sGenkinShinyouKubun = '2'   # 16.現金信用区分     0:現物、
-                                    #                   2:新規(制度信用6ヶ月)、
-                                    #                   4:返済(制度信用6ヶ月)、
-                                    #                   6:新規(一般信用6ヶ月)、
-                                    #                   8:返済(一般信用6ヶ月)。
+    # # 1:売 を指定
+    # str_sBaibaiKubun = '1'          # 12.売買区分  1:売、3:買、5:現渡、7:現引。
+    # # 2:新規(制度信用6ヶ月) を指定
+    # str_sGenkinShinyouKubun = '2'   # 16.現金信用区分     0:現物、
+    #                                 #                   2:新規(制度信用6ヶ月)、
+    #                                 #                   4:返済(制度信用6ヶ月)、
+    #                                 #                   6:新規(一般信用6ヶ月)、
+    #                                 #                   8:返済(一般信用6ヶ月)。
 
 
-    # 他のパラメーターをセット
-    #str_sZyoutoekiKazeiC            # 8.譲渡益課税区分    1：特定  3：一般  5：NISA     ログインの返信データで設定済み。 
-    str_sOrderExpireDay = '0'        # 17.注文期日  0:当日、上記以外は、注文期日日(YYYYMMDD)[10営業日迄]。
-    str_sGyakusasiOrderType = '0'    # 18.逆指値注文種別  0:通常、1:逆指値、2:通常+逆指値
-    str_sGyakusasiZyouken = '0'      # 19.逆指値条件  0:指定なし、条件値段(トリガー価格)
-    str_sGyakusasiPrice = '*'        # 20.逆指値値段  *:指定なし、0:成行、*,0以外は逆指値値段。
-    str_sTatebiType = '*'            # 21.建日種類  *:指定なし(現物または新規) 、1:個別指定、2:建日順、3:単価益順、4:単価損順。
-    str_sTategyokuZyoutoekiKazeiC =  '*'    # 9.建玉譲渡益課税区分  信用建玉における譲渡益課税区分(現引、現渡で使用)。  *:現引、現渡以外の取引、1:特定、3:一般、5:NISA
-    #str_sSecondPassword             # 22.第二パスワード    APIでは第２暗証番号を省略できない。 関連資料:「立花証券・e支店・API、インターフェース概要」の「3-2.ログイン、ログアウト」参照     ログインの返信データで設定済み。
+    # # 他のパラメーターをセット
+    # #str_sZyoutoekiKazeiC            # 8.譲渡益課税区分    1：特定  3：一般  5：NISA     ログインの返信データで設定済み。 
+    # str_sOrderExpireDay = '0'        # 17.注文期日  0:当日、上記以外は、注文期日日(YYYYMMDD)[10営業日迄]。
+    # str_sGyakusasiOrderType = '0'    # 18.逆指値注文種別  0:通常、1:逆指値、2:通常+逆指値
+    # str_sGyakusasiZyouken = '0'      # 19.逆指値条件  0:指定なし、条件値段(トリガー価格)
+    # str_sGyakusasiPrice = '*'        # 20.逆指値値段  *:指定なし、0:成行、*,0以外は逆指値値段。
+    # str_sTatebiType = '*'            # 21.建日種類  *:指定なし(現物または新規) 、1:個別指定、2:建日順、3:単価益順、4:単価損順。
+    # str_sTategyokuZyoutoekiKazeiC =  '*'    # 9.建玉譲渡益課税区分  信用建玉における譲渡益課税区分(現引、現渡で使用)。  *:現引、現渡以外の取引、1:特定、3:一般、5:NISA
+    # #str_sSecondPassword             # 22.第二パスワード    APIでは第２暗証番号を省略できない。 関連資料:「立花証券・e支店・API、インターフェース概要」の「3-2.ログイン、ログアウト」参照     ログインの返信データで設定済み。
     
 
-    str_key = '"p_no"'
-    str_value = func_check_json_dquat(str(int_p_no))
-    #req_item.append(class_req())
-    req_item[-1].add_data(str_key, str_value)
+    # str_key = '"p_no"'
+    # str_value = func_check_json_dquat(str(int_p_no))
+    # #req_item.append(class_req())
+    # req_item[-1].add_data(str_key, str_value)
 
-# "sWarningText":"",
-# "sOrderNumber":"0",
-# "sEigyouDay":"20200728",
-# "sOrderUkewatasiKingaku":"53300",
-# "sOrderTesuryou":"0",
-# "sOrderSyouhizei":"0",,
-# "sKinri":"0",,
-# "sOrderDate":"20200728144706",
+    # "sWarningText":"",
+    # "sOrderNumber":"0",
+    # "sEigyouDay":"20200728",
+    # "sOrderUkewatasiKingaku":"53300",
+    # "sOrderTesuryou":"0",
+    # "sOrderSyouhizei":"0",,
+    # "sKinri":"0",,
+    # "sOrderDate":"20200728144706",
 # }
 
 
